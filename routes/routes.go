@@ -2,6 +2,7 @@ package routes
 
 import (
 	"go-api-rest/controllers"
+	"go-api-rest/middleware"
 	"log"
 	"net/http"
 
@@ -10,6 +11,7 @@ import (
 
 func HandleResquest() {
 	r := mux.NewRouter()
+	r.Use(middleware.ContentTypeMiddleware)
 	r.HandleFunc("/", controllers.Home).Methods("Get")
 	r.HandleFunc("/api/personalidades", controllers.Index).Methods("Get")
 	r.HandleFunc("/api/personalidades/{id}", controllers.Show).Methods("Get")
