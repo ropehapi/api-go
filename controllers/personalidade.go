@@ -3,9 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"go-api-rest/database"
 	"go-api-rest/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -14,17 +14,44 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Home Page")
 }
 
-func TodasPersonalidades(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(models.Personalidades)
+func Index(w http.ResponseWriter, r *http.Request) {
+	var p []models.Personalidade
+	database.DB.Find(&p)
+	json.NewEncoder(w).Encode(p)
 }
 
-func RetornaPersonalidade(w http.ResponseWriter, r *http.Request){
+func Show(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id:= vars["id"]
+	id := vars["id"]
 
-	for _, personalidade := range models.Personalidades {
-		if strconv.Itoa(personalidade.Id) == id{
-			json.NewEncoder(w).Encode(personalidade)
-		}
-	}
+	var p models.Personalidade
+	database.DB.First(&p, id)
+	json.NewEncoder(w).Encode(p)
+}
+
+func Store(w http.ResponseWriter, r *http.Request) {
+	var personalidade models.Personalidade
+	json.NewDecoder(r.Body).Decode(&personalidade)
+	database.DB.Create(&personalidade)
+	json.NewEncoder(w).Encode(personalidade)
+}
+
+func Update(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	var p models.Personalidade
+	database.DB.First(&p, id)
+	json.NewDecoder(r.Body).Decode(&p)
+	database.DB.Save(&p)
+	json.NewEncoder(w).Encode(p)
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	var p models.Personalidade
+	database.DB.Delete(&p, id)
+	json.NewEncoder(w).Encode(p)
 }
